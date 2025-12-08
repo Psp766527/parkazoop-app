@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/utils/auth_storage.dart';
+
+import '../../data/models/dto/auth_request.dart';
+import '../../data/repositories/auth_repository.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -10,42 +12,181 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _userController = TextEditingController(text: 'admin');
-  final _passController = TextEditingController(text: 'admin');
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  bool _obscure = true;
   bool _loading = false;
 
-  Future<void> _login() async {
-    setState(() => _loading = true);
-    try {
-      await AuthStorage.saveCredentials(_userController.text.trim(), _passController.text.trim());
-      // On success navigate
-      if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed('/home');
-    } catch (e) {
-      if (!mounted) return;
-      showDialog(context: context, builder: (_) => AlertDialog(title: const Text('Error'), content: Text(e.toString())));
-    } finally {
-      setState(() => _loading = false);
+  void handleLogin() async {
+    final username = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Enter username and password")),
+      );
+      return;
     }
+
+    final request = AuthRequest(username: username, password: password);
+
+    setState(() => _loading = true);
+
+    try {
+      final response = await authRepository.login(request);
+
+      print("Login Success: $response");
+
+      // Navigate after success
+      Navigator.pushReplacementNamed(context, '/home');
+
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString())),
+      );
+    }
+
+    setState(() => _loading = false);
   }
 
   @override
   Widget build(BuildContext context) {
+    final primaryBlue = const Color(0xFF0059FF); // Parking-themed blue
+    final parkingYellow = const Color(0xFFFFC107);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Azoop Parking - Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(controller: _userController, decoration: const InputDecoration(labelText: 'Username')),
-            const SizedBox(height: 12),
-            TextField(controller: _passController, decoration: const InputDecoration(labelText: 'Password'), obscureText: true),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _loading ? null : _login,
-              child: _loading ? const CircularProgressIndicator() : const Text('Login'),
-            ),
-          ],
+      backgroundColor: Colors.white,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              // Car / Parking Illustration
+              Icon(Icons.local_parking,
+                  size: 100, color: primaryBlue),
+              const SizedBox(height: 20),
+
+              Text(
+                "Welcome to Azoop Parking",
+                style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: primaryBlue),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                "Find and manage parking spots with ease",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 35),
+
+              // Email
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.email, color: primaryBlue),
+                  labelText: "Email",
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: primaryBlue),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Password
+              TextField(
+                controller: passwordController,
+                obscureText: _obscure,
+                decoration: InputDecoration(
+                  prefixIcon:
+                  Icon(Icons.lock, color: primaryBlue),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscure
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      color: primaryBlue,
+                    ),
+                    onPressed: () {
+                      setState(() => _obscure = !_obscure);
+                    },
+                  ),
+                  labelText: "Password",
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: primaryBlue),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {},
+                  child: Text("Forgot Password?",
+                      style: TextStyle(color: primaryBlue)),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Login Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _loading ? null : handleLogin,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryBlue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: _loading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Login", style: TextStyle(fontSize: 18)),
+                      const SizedBox(width: 8),
+                      Icon(Icons.directions_car_filled,
+                          color: parkingYellow),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 25),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Don’t have an account?"),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      "Register",
+                      style: TextStyle(color: primaryBlue),
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
