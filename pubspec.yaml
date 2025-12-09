@@ -18,7 +18,9 @@ dependencies:
   riverpod_annotation: ^2.3.0
   shared_preferences: ^2.2.0
   json_annotation: ^4.9.0
+  flutter_svg: ^2.0.9
   http: ^1.2.0   # 👈 ADD THIS
+
 
 dev_dependencies:
   flutter_test:
