@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/models/dto/auth_request.dart';
-import '../../data/repositories/auth_repository.dart';
+import '../../../data/models/dto/auth_request.dart';
+import '../../../data/repositories/auth_repository.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});

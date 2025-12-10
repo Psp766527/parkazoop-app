@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:parkazoop/presentation/screens/login.dart';
-import 'presentation/screens/login_screen.dart';
+import 'package:parkazoop/presentation/screens/user/login.dart';
+import 'package:parkazoop/presentation/screens/parking/lot/view/parking_lot_screen.dart';
+import 'presentation/screens/user/login_screen.dart';
 import 'presentation/screens/home_screen.dart';
 import 'presentation/screens/available_spots_screen.dart';
 
@@ -20,7 +21,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (_) => const SignInScreen(),
         '/home': (_) => const HomeScreen(),
-        '/spots': (_) => const AvailableSpotsScreen(),
+        '/spots': (_) => const Parking3DScreen(),
+        //Will add new screens here
         // add more routes: /create-spot, /health, /spot/:id (use onGenerateRoute for param)
       },
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:parkazoop/presentation/screens/register_account.dart';
+import 'package:parkazoop/presentation/screens/user/register_account.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
