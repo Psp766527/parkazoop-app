@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
         '/': (_) => const SignInScreen(),
         '/home': (_) => const HomeScreen(),
         '/spots': (_) => const Parking3DScreen(),
+        //Will add new screens here
         // add more routes: /create-spot, /health, /spot/:id (use onGenerateRoute for param)
       },
     );
