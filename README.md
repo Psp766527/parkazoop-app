@@ -4,7 +4,12 @@ A Flutter-based mobile application for managing parking spots, reservations, and
 
 ## 📱 Project Overview
 
-**Parkazoop** is a cross-platform mobile application built with Flutter that connects to a Spring Boot backend API. The app enables users to:
+**Parkazoop** is a cross-platform application built with Flutter that connects to a Spring Boot backend API. The app supports:
+- 📱 **Mobile**: Android & iOS native apps
+- 🌐 **Web**: Runs in modern web browsers (Chrome, Firefox, Safari, Edge)
+- 💻 **Desktop**: Windows, macOS, Linux (configured but not fully tested)
+
+The app enables users to:
 - Search and filter available parking spots
 - View parking lots in an interactive 3D-style visualization
 - Reserve and manage parking sessions
@@ -126,7 +131,11 @@ parkazoop-app/
 │
 ├── android/                              # Android platform configuration
 ├── ios/                                  # iOS platform configuration
-├── web/                                  # Web platform configuration
+├── web/                                  # Web platform configuration (Browser support)
+│   ├── index.html                       # Web entry point HTML file
+│   ├── manifest.json                    # PWA manifest for installable web app
+│   ├── favicon.png                      # Browser favicon
+│   └── icons/                           # Web app icons (PWA)
 ├── windows/                              # Windows platform configuration
 ├── linux/                                # Linux platform configuration
 ├── macos/                                # macOS platform configuration
@@ -387,6 +396,7 @@ ParkingSpotDto {
 - Dart SDK
 - Android Studio / VS Code with Flutter extensions
 - Spring Boot backend running on `localhost:8080`
+- **For Web**: Modern web browser (Chrome, Firefox, Safari, or Edge)
 
 ### **Installation Steps**
 
@@ -409,10 +419,29 @@ ParkingSpotDto {
 4. **Update API base URL** (if needed)
    - Edit `lib/core/dio/api_client.dart` - Update `_baseUrl` constant
    - Edit `lib/data/repositories/auth_repository.dart` - Update `baseUrl` in Dio options
+   - **For Web Production**: Update to your deployed backend URL (not localhost)
 
 5. **Run the application**
+
+   **Mobile (Android/iOS):**
    ```bash
    flutter run
+   ```
+
+   **Web Browser:**
+   ```bash
+   flutter run -d chrome
+   # or
+   flutter run -d edge
+   # or
+   flutter run -d firefox
+   ```
+
+   **Build for Web Deployment:**
+   ```bash
+   flutter build web
+   # Output will be in build/web/ directory
+   # Deploy this folder to any web server
    ```
 
 ### **Platform-Specific Setup**
@@ -425,6 +454,39 @@ ParkingSpotDto {
 #### **iOS**
 - Minimum iOS: 11.0
 - Configured in `ios/Runner/Info.plist`
+
+#### **Web (Browser Support)**
+- ✅ **Yes, the app supports web browsers!**
+- The app can be compiled and run in modern web browsers
+- **Not simple HTML**: Flutter compiles to JavaScript (uses CanvasKit or HTML renderer)
+- **Browser Requirements:**
+  - Modern browsers with JavaScript enabled
+  - Chrome/Edge 90+, Firefox 88+, Safari 14+
+  - WebAssembly support recommended for better performance
+
+**To run on web:**
+```bash
+# Run in Chrome (default)
+flutter run -d chrome
+
+# Build for web deployment
+flutter build web
+
+# Build with specific renderer (HTML for smaller size, CanvasKit for better performance)
+flutter build web --web-renderer html
+flutter build web --web-renderer canvaskit
+```
+
+**Web Output:**
+- After building, the `build/web/` directory contains deployable files
+- Can be hosted on any static web server (Apache, Nginx, Firebase Hosting, etc.)
+- The `web/index.html` is the entry point that loads the Flutter app
+
+**Important Notes for Web:**
+- API calls to `localhost:8080` will work if backend is accessible from browser
+- For production, update API base URL to your deployed backend URL
+- SharedPreferences works via browser's localStorage
+- All Flutter widgets render properly in web browsers
 
 ---
 
@@ -456,6 +518,59 @@ HomeScreen (/home)
     ├──→ Create Spot Screen (/create-spot)
     └──→ Health Check Screen (/health)
 ```
+
+---
+
+## 🌐 Web Browser Support
+
+### **Yes, this app runs in web browsers!**
+
+The Flutter app is compiled to JavaScript and runs in modern web browsers. It's **not plain HTML** - Flutter uses:
+- **CanvasKit Renderer**: Better performance, larger bundle size (~2MB)
+- **HTML Renderer**: Smaller bundle size, good for simple UIs
+
+### **How It Works**
+
+1. **Development**: Run `flutter run -d chrome` to test in browser
+2. **Build**: Run `flutter build web` to create deployable files
+3. **Deploy**: Upload `build/web/` folder to any web server
+
+### **Web-Specific Features**
+
+- ✅ All screens work in browsers
+- ✅ API calls work (update base URL for production)
+- ✅ Authentication via SharedPreferences (uses browser localStorage)
+- ✅ Interactive 3D parking lot visualization works
+- ✅ Responsive design adapts to browser window size
+- ✅ PWA support (can be installed as web app via manifest.json)
+
+### **Browser Compatibility**
+
+| Browser | Minimum Version | Status |
+|---------|----------------|--------|
+| Chrome  | 90+ | ✅ Fully Supported |
+| Edge    | 90+ | ✅ Fully Supported |
+| Firefox | 88+ | ✅ Fully Supported |
+| Safari  | 14+ | ✅ Fully Supported |
+| Opera   | 76+ | ✅ Fully Supported |
+
+### **Web Deployment Options**
+
+- **Firebase Hosting**: `firebase deploy`
+- **GitHub Pages**: Deploy `build/web/` folder
+- **Netlify/Vercel**: Connect repository, auto-deploy
+- **Traditional Web Server**: Upload `build/web/` to Apache/Nginx
+- **Docker**: Containerize the web build
+
+### **Important Web Considerations**
+
+⚠️ **API Configuration**: 
+- Development: `localhost:8080` works if backend is accessible
+- Production: Must update to deployed backend URL (e.g., `https://api.parkazoop.com`)
+
+⚠️ **CORS**: Ensure your Spring Boot backend allows CORS from your web domain
+
+⚠️ **HTTPS**: Use HTTPS in production for secure API calls and PWA features
 
 ---
 
